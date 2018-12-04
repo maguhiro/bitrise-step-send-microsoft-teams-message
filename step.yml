@@ -26,15 +26,6 @@ is_requires_admin_user: false
 is_always_run: true
 is_skippable: true
 
-deps:
-  brew:
-  - name: git
-  - name: wget
-  apt_get:
-  - name: git
-  - name: wget
-
-
 toolkit:
   go:
     package_name: github.com/maguhiro/bitrise-step-send-microsoft-teams-message
