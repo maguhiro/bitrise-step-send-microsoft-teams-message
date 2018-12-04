@@ -1,31 +1,122 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"os"
-	"os/exec"
+	"strings"
+
+	"github.com/bitrise-io/go-utils/log"
+	"github.com/bitrise-tools/go-steputils/stepconf"
 )
 
-func main() {
-	fmt.Println("This is the value specified for the input 'example_step_input':", os.Getenv("example_step_input"))
+// Config ...
+type Config struct {
+	// Settings
+	Debug      bool            `env:"is_debug_mode,opt[yes,no]"`
+	WebhookURL stepconf.Secret `env:"webhook_url"`
+	// Message Main
+	ThemeColor        string `env:"theme_color"`
+	ThemeColorOnError string `env:"theme_color_on_error"`
+	Title             string `env:"title"`
+	TitleOnError      string `env:"title_on_error"`
+	// Message Git
+	AuthorName string `env:"author_name"`
+	Subject    string `env:"subject"`
+	// Message Content
+	Fields         string `env:"fields"`
+	Images         string `env:"images"`
+	ImagesOnError  string `env:"images_on_error"`
+	Buttons        string `env:"buttons"`
+	ButtonsOnError string `env:"buttons_on_error"`
+}
 
-	//
-	// --- Step Outputs: Export Environment Variables for other Steps:
-	// You can export Environment Variables for other Steps with
-	//  envman, which is automatically installed by `bitrise setup`.
-	// A very simple example:
-	cmdLog, err := exec.Command("bitrise", "envman", "add", "--key", "EXAMPLE_STEP_OUTPUT", "--value", "the value you want to share").CombinedOutput()
+// success is true if the build is successful, false otherwise.
+var success = os.Getenv("BITRISE_BUILD_STATUS") == "0"
+
+// selectValue chooses the right value based on the result of the build.
+func selectValue(ifSuccess, ifFailed string) string {
+	if success || ifFailed == "" {
+		return ifSuccess
+	}
+	return ifFailed
+}
+
+// ensureNewlines replaces all \n substrings with newline characters.
+func ensureNewlines(s string) string {
+	return strings.Replace(s, "\\n", "\n", -1)
+}
+
+func newMessage(c Config) Message {
+	msg := Message{
+		Context:    "https://schema.org/extension",
+		Type:       "MessageCard",
+		ThemeColor: selectValue(c.ThemeColor, c.ThemeColorOnError),
+		Title:      selectValue(c.Title, c.TitleOnError),
+		Summary:    "Result of Bitrise",
+		Sections: []Section{{
+			ActivityTitle: c.AuthorName,
+			ActivityText:  ensureNewlines(c.Subject),
+			Facts:         parsesFacts(c.Fields),
+			Images:        parsesImages(selectValue(c.Images, c.ImagesOnError)),
+			Actions:       parsesActions(selectValue(c.Buttons, c.ButtonsOnError)),
+		}},
+	}
+
+	return msg
+}
+
+// postMessage sends a message.
+func postMessage(conf Config, msg Message) error {
+	b, err := json.Marshal(msg)
 	if err != nil {
-		fmt.Printf("Failed to expose output with envman, error: %#v | output: %s", err, cmdLog)
+		return err
+	}
+	log.Debugf("Post Json Data: %s\n", b)
+
+	url := string(conf.WebhookURL)
+	req, err := http.NewRequest("POST", url, bytes.NewReader(b))
+	req.Header.Add("Content-Type", "application/json; charset=utf-8")
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to send the request: %s", err)
+	}
+	defer func() {
+		if cerr := resp.Body.Close(); err == nil {
+			err = cerr
+		}
+	}()
+
+	if resp.StatusCode != http.StatusOK {
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return fmt.Errorf("server error: %s, failed to read response: %s", resp.Status, err)
+		}
+		return fmt.Errorf("server error: %s, response: %s", resp.Status, body)
+	}
+
+	return nil
+}
+
+func main() {
+	var conf Config
+	if err := stepconf.Parse(&conf); err != nil {
+		log.Errorf("Error: %s\n", err)
 		os.Exit(1)
 	}
-	// You can find more usage examples on envman's GitHub page
-	//  at: https://github.com/bitrise-io/envman
+	stepconf.Print(conf)
+	log.SetEnableDebugLog(conf.Debug)
 
-	//
-	// --- Exit codes:
-	// The exit code of your Step is very important. If you return
-	//  with a 0 exit code `bitrise` will register your Step as "successful".
-	// Any non zero exit code will be registered as "failed" by `bitrise`.
-	os.Exit(0)
+	msg := newMessage(conf)
+	if err := postMessage(conf, msg); err != nil {
+		log.Errorf("Error: %s", err)
+		os.Exit(1)
+	}
+
+	log.Donef("\nMessage successfully sent! 🚀\n")
 }
