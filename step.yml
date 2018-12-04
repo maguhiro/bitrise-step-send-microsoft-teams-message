@@ -44,10 +44,9 @@ host_os_tags:
 type_tags:
   - notification
 
-is_requires_admin_user: true
-is_always_run: false
-is_skippable: false
-run_if: ""
+is_requires_admin_user: false
+is_always_run: true
+is_skippable: true
 
 deps:
   brew:
@@ -64,24 +63,122 @@ toolkit:
 
 
 inputs:
-  - example_step_input: Default Value - you can leave this empty if you want to
+# Settings Inputs
+  - is_debug_mode: "no"
     opts:
-      title: "Example Step Input"
-      summary: Summary. No more than 2-3 sentences.
+      title: "Debug mode?"
       description: |
-        Description of this input.
-
-        Can be Markdown formatted text.
-      is_expand: true
+        Step prints additional debug information if this option
+        is enabled
+      value_options:
+      - "yes"
+      - "no"
+  - webhook_url:
+    opts:
+      title: "Microsoft Teams Webhook URL"
+      description: |
+        Microsoft Teams Webhook URL
       is_required: true
-      value_options: []
-
-outputs:
-  - EXAMPLE_STEP_OUTPUT:
+      is_sensitive: true
+# Message Main Inputs
+  - theme_color: "10c289"
     opts:
-      title: "Example Step Output"
-      summary: Summary. No more than 2-3 sentences.
+      title: "Message card theme color"
       description: |
-        Description of this output.
+        Specifies a custom brand color for the card. 
+        Can input any hex color code (eg. ff0000).
 
-        Can be Markdown formatted text.
+        [documentation of MS Teams](https://docs.microsoft.com/en-us/outlook/actionable-messages/message-card-reference#card-fields).
+  - theme_color_on_error: "ff2158"
+    opts:
+      title: "Message card theme color if the build failed"
+      description: |
+        **This option will be used if the build failed.**
+      category: If Build Failed
+  - title: "Build Succeeded!"
+    opts:
+      title: "Message card title"
+      description: |
+        The `title` property is meant to be rendered in a prominent way, at the very top of the card.
+        Use it to introduce the content of the card in such a way users will immediately know what to expect.
+  - title_on_error: "Build Failed!"
+    opts:
+      title: "Message card title if the build failed"
+      description: |
+        **This option will be used if the build failed.**
+      category: If Build Failed
+# Message Git Inputs
+  - author_name: $GIT_CLONE_COMMIT_AUTHOR_NAME
+    opts:
+      title: "A small text used to display the author's name."
+      description: "A small text used to display the author's name."
+  - subject: $GIT_CLONE_COMMIT_MESSAGE_SUBJECT
+    opts:
+      title: "A small text used to display the subject."
+      description: "A small text used to display the subject."
+# Message Content Inputs
+  - fields: |
+      App|${BITRISE_APP_TITLE}
+      Workflow|${BITRISE_TRIGGERED_WORKFLOW_ID}
+      Branch|${BITRISE_GIT_BRANCH}
+      Tag|${BITRISE_GIT_TAG}
+      Message|${BITRISE_GIT_MESSAGE}
+    opts:
+      title: "A list of fields to be displayed in a section"
+      description: |
+        Fields separated by newlines and each field contains a `title` and a `value`.
+        The `title` and the `value` fields are separated by a pipe `|` character.
+        Empty lines and lines without a separator are omitted.
+        
+        The *title* shown as a bold heading above the `value` text.
+        The *value* is the text value of the field.
+  - images:
+    opts:
+      title: "A list of images to be displayed in a section"
+      description: |
+        Fields separated by newlines and each image contains a `title` and a `url`.
+        The `title` and the `url` fields are separated by a pipe `|` character.
+        Empty lines and lines without a separator are omitted.
+        
+        The *image url* is shown.
+  - images_on_error:
+    opts:
+      title: "A list of images to be displayed in a section if the build failed"
+      description: |
+        Fields separated by newlines and each image contains a `title` and a `url`.
+        The `title` and the `url` fields are separated by a pipe `|` character.
+        Empty lines and lines without a separator are omitted.
+        
+        The *image url* is shown.
+      category: If Build Failed
+  - buttons: |
+      View App|${BITRISE_APP_URL}
+      View Build|${BITRISE_BUILD_URL}
+      Install Page|${BITRISE_PUBLIC_INSTALL_PAGE_URL}
+    opts:
+      title: "A list of buttons attached to the message as link buttons"
+      description: |
+        Buttons separated by newlines and each field contains a `text` and a `url`.
+        The `text` and the `url` fields are separated by a pipe `|` character.
+        Empty lines and lines without a separator are omitted.
+        
+        The *text* is the label for the button.
+        The *url* is the fully qualified http or https url to deliver users to.
+
+        An attachment may contain 1 to 4 buttons.
+  - buttons_on_error: |
+      View App|${BITRISE_APP_URL}
+      View Build|${BITRISE_BUILD_URL}
+      Install Page|${BITRISE_PUBLIC_INSTALL_PAGE_URL}
+    opts:
+      title: "A list of buttons attached to the message as link buttons if the build failed"
+      description: |
+        Buttons separated by newlines and each field contains a `text` and a `url`.
+        The `text` and the `url` fields are separated by a pipe `|` character.
+        Empty lines and lines without a separator are omitted.
+        
+        The *text* is the label for the button.
+        The *url* is the fully qualified http or https url to deliver users to.
+
+        An attachment may contain 1 to 4 buttons.
+      category: If Build Failed
