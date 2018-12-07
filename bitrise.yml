@@ -7,7 +7,7 @@ app:
   - MS_TEAMS_WEBHOOK_URL: $MS_TEAMS_WEBHOOK_URL
   # If you want to share this step into a StepLib
   - BITRISE_STEP_ID: send-microsoft-teams-message
-  - BITRISE_STEP_VERSION: "0.0.1"
+  - BITRISE_STEP_VERSION: "0.1.0"
   - BITRISE_STEP_GIT_CLONE_URL: https://github.com/maguhiro/bitrise-step-send-microsoft-teams-message.git
   - MY_STEPLIB_REPO_FORK_GIT_URL: https://github.com/maguhiro/bitrise-steplib
 
