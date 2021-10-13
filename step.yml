@@ -76,6 +76,17 @@ inputs:
       description: |
         **This option will be used if the build failed.**
       category: If Build Failed
+  - summary: "Result of Bitrise"
+    opts:
+      title: "Message card summary"
+      description: |
+        The `summary` property is meant to describe the message and will be displayed when users share a message within Teams.
+  - summary_on_error: "Result of Bitrise"
+    opts:
+      title: "Message card summary if the build failed"
+      description: |
+        **This option will be used if the build failed.**
+      category: If Build Failed
 # Message Git Inputs
   - author_name: $GIT_CLONE_COMMIT_AUTHOR_NAME
     opts:
