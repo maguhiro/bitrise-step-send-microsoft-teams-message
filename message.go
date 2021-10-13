@@ -36,6 +36,7 @@ type Message struct {
 	ThemeColor string    `json:"themeColor,omitempty"`
 	Title      string    `json:"title,omitempty"`
 	Summary    string    `json:"summary,omitempty"`
+	Text       string    `json:"text,omitempty"`
 	Sections   []Section `json:"sections,omitempty"`
 }
 

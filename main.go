@@ -50,6 +50,8 @@ type Config struct {
 	TitleOnError      string `env:"title_on_error"`
 	Summary           string `env:"summary"`
 	SummaryOnError    string `env:"summary_on_error"`
+	Text              string `env:"text"`
+	TextOnError       string `env:"text_on_error"`
 	// Message Git
 	AuthorName string `env:"author_name"`
 	Subject    string `env:"subject"`
@@ -84,6 +86,7 @@ func newMessage(c Config) Message {
 		ThemeColor: selectValue(c.ThemeColor, c.ThemeColorOnError),
 		Title:      selectValue(c.Title, c.TitleOnError),
 		Summary:    selectValue(c.Summary, c.SummaryOnError),
+		Text:       selectValue(c.Text, c.TextOnError),
 		Sections: []Section{{
 			ActivityTitle: c.AuthorName,
 			ActivityText:  ensureNewlines(c.Subject),
