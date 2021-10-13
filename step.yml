@@ -107,6 +107,10 @@ inputs:
     opts:
       title: "A small text used to display the subject."
       description: "A small text used to display the subject."
+  - message: $GIT_CLONE_COMMIT_MESSAGE_BODY
+    opts:
+      title: "A text used to display the commit message."
+      description: "A text used to display the commit message."
 # Message Content Inputs
   - fields: |
       App|${BITRISE_APP_TITLE}

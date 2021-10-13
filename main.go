@@ -55,6 +55,7 @@ type Config struct {
 	// Message Git
 	AuthorName string `env:"author_name"`
 	Subject    string `env:"subject"`
+	Message    string `env:"message"`
 	// Message Content
 	Fields         string `env:"fields"`
 	Images         string `env:"images"`
@@ -90,6 +91,7 @@ func newMessage(c Config) Message {
 		Sections: []Section{{
 			ActivityTitle: c.AuthorName,
 			ActivityText:  ensureNewlines(c.Subject),
+			Text:          ensureNewlines(c.Message),
 			Facts:         parsesFacts(c.Fields),
 			Images:        parsesImages(selectValue(c.Images, c.ImagesOnError)),
 			Actions:       parsesActions(selectValue(c.Buttons, c.ButtonsOnError)),
