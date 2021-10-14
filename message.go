@@ -36,12 +36,14 @@ type Message struct {
 	ThemeColor string    `json:"themeColor,omitempty"`
 	Title      string    `json:"title,omitempty"`
 	Summary    string    `json:"summary,omitempty"`
+	Text       string    `json:"text,omitempty"`
 	Sections   []Section `json:"sections,omitempty"`
 }
 
 type Section struct {
 	ActivityTitle string   `json:"activityTitle,omitempty"`
 	ActivityText  string   `json:"activityText,omitempty"`
+	Text          string   `json:"text,omitempty"`
 	Facts         []Fact   `json:"facts,omitempty"`
 	Images        []Image  `json:"images,omitempty"`
 	Actions       []Action `json:"potentialAction,omitempty"`

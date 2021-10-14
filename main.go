@@ -48,9 +48,14 @@ type Config struct {
 	ThemeColorOnError string `env:"theme_color_on_error"`
 	Title             string `env:"title"`
 	TitleOnError      string `env:"title_on_error"`
+	Summary           string `env:"summary"`
+	SummaryOnError    string `env:"summary_on_error"`
+	Text              string `env:"text"`
+	TextOnError       string `env:"text_on_error"`
 	// Message Git
 	AuthorName string `env:"author_name"`
 	Subject    string `env:"subject"`
+	Message    string `env:"message"`
 	// Message Content
 	Fields         string `env:"fields"`
 	Images         string `env:"images"`
@@ -81,10 +86,12 @@ func newMessage(c Config) Message {
 		Type:       "MessageCard",
 		ThemeColor: selectValue(c.ThemeColor, c.ThemeColorOnError),
 		Title:      selectValue(c.Title, c.TitleOnError),
-		Summary:    "Result of Bitrise",
+		Summary:    selectValue(c.Summary, c.SummaryOnError),
+		Text:       selectValue(c.Text, c.TextOnError),
 		Sections: []Section{{
 			ActivityTitle: c.AuthorName,
 			ActivityText:  ensureNewlines(c.Subject),
+			Text:          ensureNewlines(c.Message),
 			Facts:         parsesFacts(c.Fields),
 			Images:        parsesImages(selectValue(c.Images, c.ImagesOnError)),
 			Actions:       parsesActions(selectValue(c.Buttons, c.ButtonsOnError)),

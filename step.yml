@@ -76,6 +76,28 @@ inputs:
       description: |
         **This option will be used if the build failed.**
       category: If Build Failed
+  - summary: "Result of Bitrise"
+    opts:
+      title: "Message card summary"
+      description: |
+        The `summary` property is meant to describe the message and will be displayed when users share a message within Teams.
+  - summary_on_error: "Result of Bitrise"
+    opts:
+      title: "Message card summary if the build failed"
+      description: |
+        **This option will be used if the build failed.**
+      category: If Build Failed
+  - text: ""
+    opts:
+      title: "Text of the message"
+      description: |
+        The `text` property is meant to be displayed in a normal font below the card's title. Use it to display content, such as the description of the entity being referenced, or an abstract of a news article.
+  - text_on_error: ""
+    opts:
+      title: "Text of the message if the build failed"
+      description: |
+        **This option will be used if the build failed.**
+      category: If Build Failed
 # Message Git Inputs
   - author_name: $GIT_CLONE_COMMIT_AUTHOR_NAME
     opts:
@@ -85,6 +107,10 @@ inputs:
     opts:
       title: "A small text used to display the subject."
       description: "A small text used to display the subject."
+  - message: $GIT_CLONE_COMMIT_MESSAGE_BODY
+    opts:
+      title: "A text used to display the commit message."
+      description: "A text used to display the commit message."
 # Message Content Inputs
   - fields: |
       App|${BITRISE_APP_TITLE}
